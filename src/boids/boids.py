@@ -1,13 +1,13 @@
 """An amelioration of the deliberately bad implementation of [Boids](http://dl.acm.org/citation.cfm?doid=37401.37406)."""
 
-# %%
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
 
+BIRDS_POPULATION = 50
+
 # %%
 # Deliberately terrible code for teaching purposes
-BIRDS_POPULATION = 50
 
 boids_x = [np.random.uniform(-450, 50.0) for x in range(BIRDS_POPULATION)]
 boids_y = [np.random.uniform(300.0, 600.0) for x in range(BIRDS_POPULATION)]
@@ -18,31 +18,32 @@ boids = (boids_x, boids_y, boid_x_velocities, boid_y_velocities)
 
 def update_boids(boids: tuple):
     xs, ys, xvs, yvs = boids
-    deltaXVs = [0] * len(xs)
-    deltaYVs = [0] * len(xs)
+    delta_xvs = np.zeros_like(xs)
+    delta_yvs = np.zeros_like(xs)
+
     # Fly towards the middle
     for i in range(len(xs)):
         for j in range(len(xs)):
-            deltaXVs[i] = deltaXVs[i] + (xs[j] - xs[i]) * 0.01 / len(xs)
+            delta_xvs[i] = delta_xvs[i] + (xs[j] - xs[i]) * 0.01 / len(xs)
     for i in range(len(xs)):
         for j in range(len(xs)):
-            deltaYVs[i] = deltaYVs[i] + (ys[j] - ys[i]) * 0.01 / len(xs)
+            delta_yvs[i] = delta_yvs[i] + (ys[j] - ys[i]) * 0.01 / len(xs)
     # Fly away from nearby boids
     for i in range(len(xs)):
         for j in range(len(xs)):
             if (xs[j] - xs[i]) ** 2 + (ys[j] - ys[i]) ** 2 < 100:
-                deltaXVs[i] = deltaXVs[i] + (xs[i] - xs[j])
-                deltaYVs[i] = deltaYVs[i] + (ys[i] - ys[j])
+                delta_xvs[i] = delta_xvs[i] + (xs[i] - xs[j])
+                delta_yvs[i] = delta_yvs[i] + (ys[i] - ys[j])
     # Try to match speed with nearby boids
     for i in range(len(xs)):
         for j in range(len(xs)):
             if (xs[j] - xs[i]) ** 2 + (ys[j] - ys[i]) ** 2 < 10000:
-                deltaXVs[i] = deltaXVs[i] + (xvs[j] - xvs[i]) * 0.125 / len(xs)
-                deltaYVs[i] = deltaYVs[i] + (yvs[j] - yvs[i]) * 0.125 / len(xs)
+                delta_xvs[i] = delta_xvs[i] + (xvs[j] - xvs[i]) * 0.125 / len(xs)
+                delta_yvs[i] = delta_yvs[i] + (yvs[j] - yvs[i]) * 0.125 / len(xs)
     # Update velocities
     for i in range(len(xs)):
-        xvs[i] = xvs[i] + deltaXVs[i]
-        yvs[i] = yvs[i] + deltaYVs[i]
+        xvs[i] = xvs[i] + delta_xvs[i]
+        yvs[i] = yvs[i] + delta_yvs[i]
     # Move according to velocities
     for i in range(len(xs)):
         xs[i] = xs[i] + xvs[i]
