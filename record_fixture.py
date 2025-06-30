@@ -2,7 +2,7 @@ from copy import deepcopy
 
 import yaml
 
-import boids
+from boids import boids
 
 before = deepcopy(boids.boids)
 boids.update_boids(boids.boids)
